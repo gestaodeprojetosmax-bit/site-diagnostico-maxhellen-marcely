@@ -5,7 +5,7 @@ export const site = {
     name: 'Maxhellen Marcely',
     role: 'Empresária e mentora de negócios',
     biography: 'Empresária e mentora de negócios, Maxhellen conduz empresas que já faturam a destravar o próximo nível de crescimento — com estrutura comercial, processos e estratégia, sem que tudo dependa do dono.',
-    heroImage: '/assets/especialista-retrato.jpeg',
+    heroImage: '/assets/diagnostico-capa.jpeg',
     aboutImage: '/assets/especialista-evento.jpeg',
     aboutPortrait: '/assets/especialista-retrato.jpeg',
     groupImage: '/assets/grupo-evento.jpeg',
