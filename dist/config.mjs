@@ -21,20 +21,18 @@ export const site = {
     microcopy: 'Questionário rápido. Se houver aderência, você poderá conversar com a nossa equipe.',
   },
   privacy: {
-    version: 'rascunho-2026-10-23',
-    updatedAt: '23 de outubro de 2026',
-    controller: '[NOME / RAZÃO SOCIAL DO RESPONSÁVEL]',
-    document: '[CPF OU CNPJ DO RESPONSÁVEL]',
-    contactEmail: '', // Preencher com um e-mail real antes de ativar a captação.
-    retention: '[DEFINIR PRAZO OU CRITÉRIO DE CONSERVAÇÃO DAS RESPOSTAS]',
-    marketingRetention: '[DEFINIR PRAZO OU CRITÉRIO DE CONSERVAÇÃO PARA COMUNICAÇÕES]',
-    processors: '[INFORMAR FORNECEDORES, FINALIDADES E EVENTUAIS TRANSFERÊNCIAS INTERNACIONAIS]',
+    version: '2026-10-26-v2',
+    updatedAt: '26 de outubro de 2026',
+    controller: '',
+    document: '',
+    contactEmail: '',
+    retention: '',
+    marketingRetention: '',
+    processors: '',
   },
   integration: {
-    // Rota server-side Vercel encaminha para n8n via WEBHOOK_URL (variável secreta).
-    // A rota permanece bloqueada até configurar o webhook e revisar a política.
+    // O frontend envia para a rota Vercel; a função controla a ativação e encaminha via WEBHOOK_URL.
     endpoint: '/api/diagnosticos',
-    privacyReady: false,
     timeoutMs: 15000,
   },
 };

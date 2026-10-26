@@ -1,6 +1,6 @@
 # Integração do recebimento
 
-Estado atual: a função Vercel `POST /api/diagnosticos` está preparada para validar e encaminhar as respostas a um webhook n8n. **O envio permanece desligado**: não há `WEBHOOK_URL` configurada e a política ainda contém campos pendentes. Até essas condições serem resolvidas, o navegador não envia respostas e a função do servidor não encaminha dados.
+Estado atual: o frontend envia para a função Vercel `POST /api/diagnosticos` sem exigir nome legal, documento, e-mail de privacidade ou outros campos administrativos da política. A função valida e encaminha para o webhook somente quando `DIAGNOSTICS_ENABLED` é exatamente `true` e `WEBHOOK_URL` contém uma URL HTTPS válida. Campos não informados na política são apresentados como não informados; não são usados como trava técnica.
 
 ## Editar a página
 
@@ -19,7 +19,7 @@ Quando a pessoa clicar em enviar no fim do formulário, a função server-side v
 Configure na Vercel, em **Project → Settings → Environment Variables**:
 
 - `WEBHOOK_URL`: URL **Production** do Webhook node do n8n, armazenada como variável **Secret**. Não usar a Test URL em produção nem colocar a URL no GitHub, em `dist/config.mjs` ou em variável `VITE_`/pública.
-- `DIAGNOSTICS_ENABLED`: deixe ausente ou diferente de `true` enquanto a política estiver incompleta. A função só encaminha dados quando o valor for exatamente `true`.
+- `DIAGNOSTICS_ENABLED`: defina como `true` para habilitar o encaminhamento server-side. A função só encaminha quando o valor for exatamente `true`; a presença ou ausência de dados administrativos na política não altera essa regra técnica.
 
 No workflow n8n, configure o Webhook node para `POST`, grave uma cópia no Supabase e use um **Respond to Webhook** no final. Depois da gravação bem-sucedida no Supabase, responda com `application/json`, por exemplo `{"accepted":true,"submissionId":"<id-gravado>"}`. Sem essa confirmação explícita, o formulário não informa sucesso. O proxy encaminha o cabeçalho `Idempotency-Key`; configure deduplicação no workflow/destino usando essa chave se uma repetição não puder criar registros duplicados.
 
@@ -27,14 +27,13 @@ A função valida a origem da requisição, o formato e o tamanho do payload, os
 
 ## Ativar a captação
 
-1. Preencher e revisar a política: responsável e documento, e-mail de privacidade, prazos de conservação, fornecedores e eventuais transferências. Rever o texto e os consentimentos com o responsável pelo tratamento.
-2. Criar e ativar o workflow n8n, usar a Production URL e configurar a resposta explícita depois da persistência, como descrito acima.
-3. Cadastrar `WEBHOOK_URL` como Secret na Vercel. Não definir `DIAGNOSTICS_ENABLED=true` ainda.
-4. Depois da revisão da política, preencher os campos correspondentes em `dist/config.mjs`, atualizar a versão do aviso, definir `privacyReady: true` e manter `endpoint: '/api/diagnosticos'`. Então definir `DIAGNOSTICS_ENABLED=true` na Vercel e publicar um novo deploy.
-5. Antes de divulgar, testar uma submissão consentida de ponta a ponta e confirmar que chegou somente ao destino autorizado, sem dados pessoais em logs. Adicionar rate limiting e proteção antispam compatível com a acessibilidade na camada Vercel ou no n8n.
-6. A função já revalida no servidor os formatos, limites, opções permitidas, desafios (um a três), descrição obrigatória de “Outro”, consentimentos e campos inesperados. A faixa de faturamento e investimento é declarativa; nenhuma inferência de aderência é feita.
-7. Manter no fluxo/destino a versão do aviso e os dois consentimentos separados. Definir deduplicação por `Idempotency-Key`, controle de acesso, retenção, eliminação e atendimento aos direitos do titular no sistema que persistir os dados.
-8. Remover `noindex` somente quando a página final estiver pronta para o público.
+1. Criar e ativar o workflow n8n, usar a Production URL e configurar a resposta explícita depois da persistência, como descrito acima.
+2. Cadastrar `WEBHOOK_URL` como Secret na Vercel e `DIAGNOSTICS_ENABLED=true` no ambiente em que o recebimento deve ocorrer. Não colocar a URL secreta no GitHub.
+3. Publicar/reimplantar o projeto após alterar variáveis de ambiente.
+4. Antes de divulgar, testar uma submissão controlada de ponta a ponta e confirmar que chegou somente ao destino autorizado, sem dados pessoais em logs. Adicionar rate limiting e proteção antispam compatível com a acessibilidade na camada Vercel ou no n8n.
+5. A função revalida no servidor os formatos, limites, opções permitidas, desafios (um a três), descrição obrigatória de “Outro”, consentimentos e campos inesperados. A faixa de faturamento e investimento é declarativa; nenhuma inferência de aderência é feita.
+6. Manter no fluxo/destino a versão do aviso e os dois consentimentos separados. Definir deduplicação por `Idempotency-Key`, controle de acesso, retenção, eliminação e atendimento aos direitos do titular no sistema que persistir os dados.
+7. Informações de privacidade incompletas não bloqueiam tecnicamente o envio. A política apresenta como não informados os dados que o operador ainda não forneceu; revise-a para descrever fielmente a operação real.
 
 ## Contrato de requisição
 

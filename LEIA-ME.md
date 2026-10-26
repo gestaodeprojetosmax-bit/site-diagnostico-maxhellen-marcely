@@ -18,6 +18,8 @@ A pasta `dist/` é o site pronto para hospedagem estática. Publique o conteúdo
 
 O projeto inclui `vercel.json` para executar os testes (`npm test`) e publicar `dist/`. Consulte [`VERCEL.md`](VERCEL.md) para importar o repositório e concluir a configuração.
 
-## Estado da captação
+## Envio do formulário
 
-O endpoint Vercel `/api/diagnosticos` está preparado para encaminhar o JSON do formulário a um webhook n8n, mas permanece bloqueado: ainda não há `WEBHOOK_URL` configurada e a política tem campos por preencher. O formulário não envia dados até a integração e a política serem configuradas. Siga [`INTEGRATION.md`](INTEGRATION.md); nunca grave a URL secreta do webhook no frontend ou no GitHub.
+O formulário envia as respostas finais para a rota same-origin `/api/diagnosticos`. A função Vercel valida os dados e encaminha para a URL guardada na variável secreta `WEBHOOK_URL`; `DIAGNOSTICS_ENABLED=true` precisa estar configurada no ambiente do deployment. O frontend não exige nome legal, documento, e-mail de privacidade nem campos administrativos para chamar a rota. Se o endpoint, a ativação ou o webhook estiverem incorretos, o formulário informa falha e não confirma recebimento. Nunca grave a URL secreta no frontend ou no GitHub.
+
+A página de privacidade informa com transparência os dados que ainda não foram fornecidos pelo operador; esses dados não são utilizados como trava técnica de envio. Revise o texto para refletir o fluxo real e o canal de atendimento antes de divulgar amplamente.

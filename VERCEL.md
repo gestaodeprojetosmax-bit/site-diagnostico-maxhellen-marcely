@@ -12,12 +12,12 @@ O projeto está preparado como site estático. A configuração em `vercel.json`
 ## Encaminhar ao n8n e guardar no Supabase
 
 1. Na Vercel, abra **Project → Settings → Environment Variables** e adicione `WEBHOOK_URL` como variável **Secret**, com a **Production URL** do Webhook node do n8n. Não coloque essa URL no código nem no GitHub.
-2. Mantenha `DIAGNOSTICS_ENABLED` ausente ou diferente de `true` enquanto a política estiver incompleta. O endpoint `/api/diagnosticos` só encaminha quando essa variável for exatamente `true`.
+2. Defina `DIAGNOSTICS_ENABLED` como `true` no ambiente que deve receber os envios. O endpoint `/api/diagnosticos` só encaminha quando essa variável for exatamente `true` e `WEBHOOK_URL` for uma URL HTTPS válida.
 3. No workflow n8n, receba o JSON por `POST`, grave uma cópia no Supabase e configure **Respond to Webhook** depois da gravação. Responda `application/json` com `{"accepted":true,"submissionId":"<id-gravado>"}`; sem esse recibo o site não apresenta sucesso.
 4. O proxy Vercel encaminha os dados e não os armazena. Mantenha o Supabase como destino/backup dentro do workflow n8n e trate `Idempotency-Key` para reduzir duplicatas em tentativas repetidas.
 
 ## Antes de divulgar ou recolher respostas
 
-- O endpoint está preparado, mas o envio permanece bloqueado até configurar `WEBHOOK_URL`, ativar o workflow n8n e definir `DIAGNOSTICS_ENABLED=true`. Não anunciar que houve envio ou receção de dados antes de testar o fluxo completo.
-- A política de privacidade ainda contém campos entre parênteses retos, como identificação do responsável e contacto. Preencher e rever o texto para a operação real antes de divulgar o site.
-- Para ativar captação, preencher a política e seguir [`INTEGRATION.md`](INTEGRATION.md). Não incluir chaves, senhas ou URLs secretas no frontend ou no GitHub.
+- A interface envia para a rota same-origin sem exigir nome legal, documento, e-mail de privacidade ou outros campos administrativos da política. Isso não comprova que o webhook recebeu e persistiu os dados.
+- Campos da política que o operador não forneceu são exibidos como informações não especificadas; a página não deve apresentar valores inventados. Revise-a para descrever fielmente o fluxo real.
+- Não anunciar que houve recebimento antes de testar o fluxo completo. Consulte [`INTEGRATION.md`](INTEGRATION.md) e nunca inclua chaves, senhas ou URLs secretas no frontend ou no GitHub.

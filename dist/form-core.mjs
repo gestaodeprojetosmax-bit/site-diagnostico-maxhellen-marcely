@@ -54,9 +54,11 @@ export function validateStep(step, a) {
 }
 
 export function integrationReady(config) {
-  return typeof config.integration.endpoint === 'string' && /^\/(?!\/)[a-zA-Z0-9/_-]+$/.test(config.integration.endpoint)
-    && config.integration.privacyReady === true && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.privacy.contactEmail)
-    && [config.specialist.name, config.method.name, config.specialist.biography, config.method.description, config.privacy.controller, config.privacy.document, config.privacy.retention, config.privacy.marketingRetention, config.privacy.processors].every(v => typeof v === 'string' && v.trim() && !/\[.*\]/.test(v));
+  // O frontend só verifica que chama uma rota same-origin. A função server-side
+  // controla o recebimento e a configuração do webhook; dados da política não
+  // são pré-requisitos técnicos para submeter o formulário.
+  return typeof config.integration.endpoint === 'string'
+    && /^\/(?!\/)[a-zA-Z0-9/_-]+$/.test(config.integration.endpoint);
 }
 
 export function buildPayload(a, policyVersion) {
