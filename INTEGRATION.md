@@ -73,10 +73,41 @@ Idempotency-Key: <identificador aleatório>
 }
 ```
 
-Ao encaminhar ao n8n, a função Vercel acrescenta `submittedAt` ao objeto recebido. É um timestamp ISO 8601 em UTC, gerado no servidor no momento do recebimento; não precisa ser enviado pelo navegador:
+O corpo recebido pelo n8n usa nomes de campos em português. A Vercel converte os nomes internos e acrescenta `dataHoraEnvio` (ISO 8601 em UTC), gerado no servidor no momento do recebimento, além de `chaveIdempotencia`:
 
 ```json
-{ "submittedAt": "2026-10-26T20:08:00.000Z" }
+{
+  "versaoEsquema": 1,
+  "origem": "diagnostico-empresarial",
+  "dataHoraEnvio": "2026-10-26T20:08:00.000Z",
+  "chaveIdempotencia": "<chave-idempotencia>",
+  "contato": {
+    "nomeCompleto": "Pessoa de Exemplo",
+    "empresa": "Empresa de Exemplo",
+    "enderecoDoSite": null,
+    "telefoneWhatsapp": "+5585999991234",
+    "enderecoEmail": "exemplo@example.com",
+    "localizacao": null
+  },
+  "negocio": {
+    "faturamento": "Mais de R$ 30 mil até R$ 80 mil",
+    "segmento": "Prestação de serviços",
+    "equipeComercial": "1 a 2"
+  },
+  "desafios": ["Vender mais com previsibilidade"],
+  "outroDesafio": null,
+  "prioridade90Dias": null,
+  "prontidao": {
+    "prazo": "Nos próximos 30 dias",
+    "investimento": "R$ 5 mil a R$ 15 mil",
+    "decisao": "Sou o decisor principal"
+  },
+  "consentimentos": {
+    "analiseDiagnostica": true,
+    "comunicacaoMarketing": false,
+    "versaoPoliticaPrivacidade": "2026-10-26-v2"
+  }
+}
 ```
 
 A interface mostra sucesso quando a função recebe qualquer resposta HTTP 2xx do webhook. Isso confirma que o destino aceitou a requisição, mas não comprova por si só que o n8n persistiu os dados.

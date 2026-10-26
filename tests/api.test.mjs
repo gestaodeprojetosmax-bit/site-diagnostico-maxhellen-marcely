@@ -105,10 +105,40 @@ test('encaminha todos os campos e a chave de idempotência ao n8n', async () => 
       assert.deepEqual(await response.json(), { accepted: true, submissionId: 'a'.repeat(32) });
       assert.equal(captured.url, webhookEnv.WEBHOOK_URL);
       const forwardedPayload = JSON.parse(captured.init.body);
-      const { submittedAt, ...forwardedAnswers } = forwardedPayload;
-      assert.deepEqual(forwardedAnswers, payload);
-      assert.match(submittedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-      assert.ok(Number.isFinite(Date.parse(submittedAt)));
+      const { dataHoraEnvio, ...forwardedAnswers } = forwardedPayload;
+      assert.deepEqual(forwardedAnswers, {
+        versaoEsquema: payload.schemaVersion,
+        origem: payload.source,
+        chaveIdempotencia: 'a'.repeat(32),
+        contato: {
+          nomeCompleto: payload.contact.fullName,
+          empresa: payload.contact.company,
+          enderecoDoSite: payload.contact.website,
+          telefoneWhatsapp: payload.contact.whatsapp,
+          enderecoEmail: payload.contact.email,
+          localizacao: payload.contact.location,
+        },
+        negocio: {
+          faturamento: payload.business.revenue,
+          segmento: payload.business.segment,
+          equipeComercial: payload.business.salesTeam,
+        },
+        desafios: payload.challenges,
+        outroDesafio: payload.otherChallenge,
+        prioridade90Dias: payload.priority90Days,
+        prontidao: {
+          prazo: payload.readiness.timing,
+          investimento: payload.readiness.investment,
+          decisao: payload.readiness.decision,
+        },
+        consentimentos: {
+          analiseDiagnostica: payload.consent.diagnostic,
+          comunicacaoMarketing: payload.consent.marketing,
+          versaoPoliticaPrivacidade: payload.consent.privacyVersion,
+        },
+      });
+      assert.match(dataHoraEnvio, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      assert.ok(Number.isFinite(Date.parse(dataHoraEnvio)));
       assert.equal(captured.init.headers['Idempotency-Key'], 'a'.repeat(32));
       assert.equal(captured.init.redirect, 'error');
     } finally { globalThis.fetch = originalFetch; }

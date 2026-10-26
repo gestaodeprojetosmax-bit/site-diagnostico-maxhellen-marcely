@@ -67,7 +67,38 @@ export async function POST(request) {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7_000);
-  const webhookPayload = { ...body, submittedAt: new Date().toISOString() };
+  const webhookPayload = {
+    versaoEsquema: body.schemaVersion,
+    origem: body.source,
+    dataHoraEnvio: new Date().toISOString(),
+    chaveIdempotencia: idempotencyKey,
+    contato: {
+      nomeCompleto: body.contact.fullName,
+      empresa: body.contact.company,
+      enderecoDoSite: body.contact.website,
+      telefoneWhatsapp: body.contact.whatsapp,
+      enderecoEmail: body.contact.email,
+      localizacao: body.contact.location,
+    },
+    negocio: {
+      faturamento: body.business.revenue,
+      segmento: body.business.segment,
+      equipeComercial: body.business.salesTeam,
+    },
+    desafios: body.challenges,
+    outroDesafio: body.otherChallenge,
+    prioridade90Dias: body.priority90Days,
+    prontidao: {
+      prazo: body.readiness.timing,
+      investimento: body.readiness.investment,
+      decisao: body.readiness.decision,
+    },
+    consentimentos: {
+      analiseDiagnostica: body.consent.diagnostic,
+      comunicacaoMarketing: body.consent.marketing,
+      versaoPoliticaPrivacidade: body.consent.privacyVersion,
+    },
+  };
   try {
     const upstream = await fetch(webhookUrl, {
       method: 'POST',
