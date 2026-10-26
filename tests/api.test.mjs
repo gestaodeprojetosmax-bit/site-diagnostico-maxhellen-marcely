@@ -97,15 +97,12 @@ test('encaminha todos os campos e a chave de idempotência ao n8n', async () => 
     let captured;
     globalThis.fetch = async (url, init) => {
       captured = { url, init };
-      return new Response(JSON.stringify({ accepted: true, submissionId: 'n8n-item-123' }), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(null, { status: 204 });
     };
     try {
       const response = await POST(makeRequest(payload));
       assert.equal(response.status, 200);
-      assert.deepEqual(await response.json(), { accepted: true, submissionId: 'n8n-item-123' });
+      assert.deepEqual(await response.json(), { accepted: true, submissionId: 'a'.repeat(32) });
       assert.equal(captured.url, webhookEnv.WEBHOOK_URL);
       assert.deepEqual(JSON.parse(captured.init.body), payload);
       assert.equal(captured.init.headers['Idempotency-Key'], 'a'.repeat(32));
@@ -114,17 +111,26 @@ test('encaminha todos os campos e a chave de idempotência ao n8n', async () => 
   });
 });
 
-test('não confirma recebimento se o n8n responder sem comprovante explícito', async () => {
+test('aceita resposta HTTP 2xx simples do n8n sem JSON personalizado', async () => {
   await withEnv(webhookEnv, async () => {
     const originalFetch = globalThis.fetch;
-    globalThis.fetch = async () => new Response(JSON.stringify({ message: 'workflow started' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    globalThis.fetch = async () => new Response('workflow started', { status: 200 });
+    try {
+      const response = await POST(makeRequest(samplePayload()));
+      assert.equal(response.status, 200);
+      assert.deepEqual(await response.json(), { accepted: true, submissionId: 'a'.repeat(32) });
+    } finally { globalThis.fetch = originalFetch; }
+  });
+});
+
+test('resposta HTTP não 2xx do n8n continua sendo reportada como falha', async () => {
+  await withEnv(webhookEnv, async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response('workflow failed', { status: 500 });
     try {
       const response = await POST(makeRequest(samplePayload()));
       assert.equal(response.status, 502);
-      assert.deepEqual(await response.json(), { error: 'receiver_unconfirmed' });
+      assert.deepEqual(await response.json(), { error: 'receiver_failed' });
     } finally { globalThis.fetch = originalFetch; }
   });
 });

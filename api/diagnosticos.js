@@ -78,13 +78,9 @@ export async function POST(request) {
     });
     if (upstream.status === 429) return json({ error: 'receiver_rate_limited' }, 429);
     if (!upstream.ok) return json({ error: 'receiver_failed' }, 502);
-
-    let receipt;
-    try { receipt = await upstream.json(); } catch { return json({ error: 'receiver_unconfirmed' }, 502); }
-    if (receipt?.accepted !== true || typeof receipt.submissionId !== 'string' || !receipt.submissionId.trim() || receipt.submissionId.length > 200) {
-      return json({ error: 'receiver_unconfirmed' }, 502);
-    }
-    return json({ accepted: true, submissionId: receipt.submissionId });
+    // Qualquer resposta HTTP 2xx do webhook significa que ele aceitou a requisição.
+    // Não exigimos um corpo JSON proprietário; a chave idempotente identifica o envio.
+    return json({ accepted: true, submissionId: idempotencyKey });
   } catch {
     return json({ error: 'receiver_unavailable' }, 502);
   } finally {

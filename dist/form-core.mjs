@@ -75,7 +75,7 @@ export function buildPayload(a, policyVersion) {
 
 export class SubmissionError extends Error { constructor(message, code = 'request') { super(message); this.code = code; } }
 
-// Nunca chama a rede em modo de prévia. O servidor deve persistir antes de confirmar.
+// Nunca chama a rede em modo de prévia. O servidor confirma quando o destino aceita a requisição.
 export async function submitDiagnostic(answers, config, requestId, fetcher = fetch) {
   if (!integrationReady(config)) throw new SubmissionError('O recebimento das respostas ainda não foi ativado. Nenhum dado foi enviado.', 'not-configured');
   for (let step = 0; step < 4; step++) if (Object.keys(validateStep(step, answers)).length) throw new SubmissionError('Revise os campos obrigatórios antes de enviar.', 'validation');

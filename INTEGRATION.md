@@ -21,13 +21,13 @@ Configure na Vercel, em **Project → Settings → Environment Variables**:
 - `WEBHOOK_URL`: URL **Production** do Webhook node do n8n, armazenada como variável **Secret**. Não usar a Test URL em produção nem colocar a URL no GitHub, em `dist/config.mjs` ou em variável `VITE_`/pública.
 - `DIAGNOSTICS_ENABLED`: defina como `true` para habilitar o encaminhamento server-side. A função só encaminha quando o valor for exatamente `true`; a presença ou ausência de dados administrativos na política não altera essa regra técnica.
 
-No workflow n8n, configure o Webhook node para `POST`, grave uma cópia no Supabase e use um **Respond to Webhook** no final. Depois da gravação bem-sucedida no Supabase, responda com `application/json`, por exemplo `{"accepted":true,"submissionId":"<id-gravado>"}`. Sem essa confirmação explícita, o formulário não informa sucesso. O proxy encaminha o cabeçalho `Idempotency-Key`; configure deduplicação no workflow/destino usando essa chave se uma repetição não puder criar registros duplicados.
+No workflow n8n, configure o Webhook node para `POST` e, se desejar, grave uma cópia no Supabase. Não é necessário um nó **Respond to Webhook** com JSON personalizado: qualquer resposta HTTP de sucesso (2xx, inclusive 204 ou 200 vazio) é aceita. Se o n8n devolver erro HTTP, não responder ou exceder o tempo limite, o formulário informará falha. O proxy encaminha o cabeçalho `Idempotency-Key`; configure deduplicação no workflow/destino usando essa chave se uma repetição não puder criar registros duplicados.
 
 A função valida a origem da requisição, o formato e o tamanho do payload, os campos e opções permitidos, o consentimento obrigatório, e não registra o corpo com dados pessoais. Erros do webhook não são apresentados como recebimento bem-sucedido. O proxy não armazena os dados: o workflow n8n e o destino configurado passam a fazer parte do fluxo de tratamento e devem ser documentados na política.
 
 ## Ativar a captação
 
-1. Criar e ativar o workflow n8n, usar a Production URL e configurar a resposta explícita depois da persistência, como descrito acima.
+1. Criar e ativar o workflow n8n e usar a Production URL. O n8n pode responder com qualquer status 2xx; não é exigido corpo JSON especial.
 2. Cadastrar `WEBHOOK_URL` como Secret na Vercel e `DIAGNOSTICS_ENABLED=true` no ambiente em que o recebimento deve ocorrer. Não colocar a URL secreta no GitHub.
 3. Publicar/reimplantar o projeto após alterar variáveis de ambiente.
 4. Antes de divulgar, testar uma submissão controlada de ponta a ponta e confirmar que chegou somente ao destino autorizado, sem dados pessoais em logs. Adicionar rate limiting e proteção antispam compatível com a acessibilidade na camada Vercel ou no n8n.

@@ -13,7 +13,7 @@ O projeto está preparado como site estático. A configuração em `vercel.json`
 
 1. Na Vercel, abra **Project → Settings → Environment Variables** e adicione `WEBHOOK_URL` como variável **Secret**, com a **Production URL** do Webhook node do n8n. Não coloque essa URL no código nem no GitHub.
 2. Defina `DIAGNOSTICS_ENABLED` como `true` no ambiente que deve receber os envios. O endpoint `/api/diagnosticos` só encaminha quando essa variável for exatamente `true` e `WEBHOOK_URL` for uma URL HTTPS válida.
-3. No workflow n8n, receba o JSON por `POST`, grave uma cópia no Supabase e configure **Respond to Webhook** depois da gravação. Responda `application/json` com `{"accepted":true,"submissionId":"<id-gravado>"}`; sem esse recibo o site não apresenta sucesso.
+3. No workflow n8n, receba o JSON por `POST` e, se desejar, grave uma cópia no Supabase. Não é necessário configurar resposta JSON especial: qualquer status HTTP 2xx do webhook basta para o site apresentar que o envio foi aceito.
 4. O proxy Vercel encaminha os dados e não os armazena. Mantenha o Supabase como destino/backup dentro do workflow n8n e trate `Idempotency-Key` para reduzir duplicatas em tentativas repetidas.
 
 ## Antes de divulgar ou recolher respostas
