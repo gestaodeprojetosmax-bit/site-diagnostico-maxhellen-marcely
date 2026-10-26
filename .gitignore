@@ -1,5 +1,9 @@
 node_modules/
 .DS_Store
+.vercel/
+.env
+.env.*
+!.env.example
 *.tar.gz
 *.tar
 dist/__qa.html

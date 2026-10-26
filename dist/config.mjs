@@ -31,11 +31,10 @@ export const site = {
     processors: '[INFORMAR FORNECEDORES, FINALIDADES E EVENTUAIS TRANSFERÊNCIAS INTERNACIONAIS]',
   },
   integration: {
-    // INTEGRAÇÃO PENDENTE: este projeto não possui backend de recebimento.
-    // Endpoint deve ser da mesma origem, validado no servidor e sem segredos públicos.
-    // Contrato completo em INTEGRATION.md. Sucesso só após confirmação real do servidor.
-    endpoint: '', // Exemplo após implementar: '/api/diagnosticos'
-    privacyReady: false, // Só ativar após preencher e revisar a política e o contato.
+    // Rota server-side Vercel encaminha para n8n via WEBHOOK_URL (variável secreta).
+    // A rota permanece bloqueada até configurar o webhook e revisar a política.
+    endpoint: '/api/diagnosticos',
+    privacyReady: false,
     timeoutMs: 15000,
   },
 };

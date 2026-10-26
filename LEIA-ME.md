@@ -20,4 +20,4 @@ O projeto inclui `vercel.json` para executar os testes (`npm test`) e publicar `
 
 ## Estado da captação
 
-Antes de publicar para captação: ainda não há backend para receber respostas. O questionário funciona como prévia e não envia nem salva dados. A política de privacidade também contém campos por preencher. Complete esses itens antes de divulgar o site; não inclua segredos no frontend.
+O endpoint Vercel `/api/diagnosticos` está preparado para encaminhar o JSON do formulário a um webhook n8n, mas permanece bloqueado: ainda não há `WEBHOOK_URL` configurada e a política tem campos por preencher. O formulário não envia dados até a integração e a política serem configuradas. Siga [`INTEGRATION.md`](INTEGRATION.md); nunca grave a URL secreta do webhook no frontend ou no GitHub.
