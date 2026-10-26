@@ -67,11 +67,12 @@ export async function POST(request) {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7_000);
+  const webhookPayload = { ...body, submittedAt: new Date().toISOString() };
   try {
     const upstream = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Idempotency-Key': idempotencyKey },
-      body: JSON.stringify(body),
+      body: JSON.stringify(webhookPayload),
       cache: 'no-store',
       redirect: 'error',
       signal: controller.signal,

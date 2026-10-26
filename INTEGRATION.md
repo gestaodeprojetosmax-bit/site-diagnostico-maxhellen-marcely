@@ -73,11 +73,13 @@ Idempotency-Key: <identificador aleatório>
 }
 ```
 
-Sucesso real, após persistência:
+Ao encaminhar ao n8n, a função Vercel acrescenta `submittedAt` ao objeto recebido. É um timestamp ISO 8601 em UTC, gerado no servidor no momento do recebimento; não precisa ser enviado pelo navegador:
 
 ```json
-{ "accepted": true, "submissionId": "<id persistido>" }
+{ "submittedAt": "2026-10-26T20:08:00.000Z" }
 ```
+
+A interface mostra sucesso quando a função recebe qualquer resposta HTTP 2xx do webhook. Isso confirma que o destino aceitou a requisição, mas não comprova por si só que o n8n persistiu os dados.
 
 Falhas suportadas: 400/422 (validação), 429 (muitas tentativas), demais erros HTTP, JSON inválido, timeout e indisponibilidade de rede. A interface mantém respostas na memória para revisão/tentativa, bloqueia cliques repetidos durante o envio e nunca afirma sucesso em erro. O servidor decide sobre aderência fora deste fluxo; não há calendário nem aprovação automática.
 

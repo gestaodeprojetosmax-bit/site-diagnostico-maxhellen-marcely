@@ -104,7 +104,11 @@ test('encaminha todos os campos e a chave de idempotência ao n8n', async () => 
       assert.equal(response.status, 200);
       assert.deepEqual(await response.json(), { accepted: true, submissionId: 'a'.repeat(32) });
       assert.equal(captured.url, webhookEnv.WEBHOOK_URL);
-      assert.deepEqual(JSON.parse(captured.init.body), payload);
+      const forwardedPayload = JSON.parse(captured.init.body);
+      const { submittedAt, ...forwardedAnswers } = forwardedPayload;
+      assert.deepEqual(forwardedAnswers, payload);
+      assert.match(submittedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      assert.ok(Number.isFinite(Date.parse(submittedAt)));
       assert.equal(captured.init.headers['Idempotency-Key'], 'a'.repeat(32));
       assert.equal(captured.init.redirect, 'error');
     } finally { globalThis.fetch = originalFetch; }
